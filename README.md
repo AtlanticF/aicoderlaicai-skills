@@ -62,4 +62,4 @@ description: Briefly describe what the skill does, when it should trigger, and w
 
 ## License
 
-Add a license if you plan to distribute this repository publicly.
+MIT. See `LICENSE`.
