@@ -6,10 +6,10 @@ This repository is intended to host reusable, task-focused skills that can be in
 
 ## Install
 
-Use `npx add skills` to install skills from this repository:
+Use `npx skills add` to install skills from this repository:
 
 ```bash
-npx add skills
+npx skills add https://github.com/AtlanticF/aicoderlaicai-skills <skillname>
 ```
 
 ## Included Skills
