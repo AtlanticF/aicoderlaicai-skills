@@ -1,0 +1,4 @@
+# Store large character-asset binaries via Git LFS so the repo stays lean.
+3d-character-generation/examples/*.mov filter=lfs diff=lfs merge=lfs -text
+3d-character-generation/examples/*.webm filter=lfs diff=lfs merge=lfs -text
+3d-character-generation/examples/*.mp4 filter=lfs diff=lfs merge=lfs -text
