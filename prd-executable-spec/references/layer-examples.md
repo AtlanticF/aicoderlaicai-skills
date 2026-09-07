@@ -227,3 +227,91 @@ value = ROUND_DOWN(raw_value, decimals)
       '401':
         description: Unauthorized
 ```
+
+---
+
+## Entity Impact (Foundation — Data Layer, grounded in the real system)
+
+> **Why this matters**: A JSON Schema alone reads as greenfield. Engineers must
+> know whether a field lands in a new table or mutates a hot existing one — that
+> single fact can swing an estimate from hours to a migration project.
+
+```json
+{
+  "new_entities": ["LeaderboardSnapshot"],
+  "modified_entities": ["ScoringResult"],
+  "migration_notes": "Add nullable column ScoringResult.completed_at (backfill required); add index (completed_at). No downtime; backfill in batches of 10k."
+}
+```
+
+Checklist:
+- New entity → provide the full JSON Schema.
+- Modified entity → list only the changed/added fields and the migration impact
+  (nullable? backfill? index? lock risk on a large table?).
+
+---
+
+## Error / Idempotency / Observability Contract
+
+> **Why this matters**: Failure paths and on-call debugging are where interfaces
+> actually break down. Make the contract explicit, not implied by a "sad path"
+> scenario.
+
+### Error contract
+
+```json
+{
+  "errors": [
+    { "code": "SCORING_NOT_READY", "http_status": 409, "when": "leaderboard triggered before scoring completes", "retriable": true },
+    { "code": "INVALID_TIMEZONE",  "http_status": 400, "when": "user timezone is unknown/unset",              "retriable": false }
+  ],
+  "idempotent": true,
+  "idempotency_key": "date + timezone",
+  "retry_policy": "exponential backoff, max 5 attempts, then alert on-call"
+}
+```
+
+Rules:
+- Every failure-path Gherkin scenario maps to one `errors[]` entry.
+- If `idempotent: true`, define the `idempotency_key`.
+- Every `retriable: true` error has a `retry_policy`.
+
+### Observability
+
+```json
+{
+  "logs": ["leaderboard.trigger.received", "leaderboard.compute.completed", "leaderboard.compute.failed"],
+  "metrics": ["leaderboard_compute_duration_ms (histogram)", "leaderboard_compute_failures_total (counter)"],
+  "alerts": ["scoring not complete by 02:00 local time", "compute p99 > 60s"]
+}
+```
+
+---
+
+## Test-Stub Generation (making the spec runnable)
+
+Each `.feature` can be turned into failing step stubs so the spec becomes the
+starting point of the test suite. Example (pytest-bdd):
+
+```python
+# m03-leaderboard.steps.py  (generated from m03-leaderboard.feature)
+from pytest_bdd import scenarios, given, when, then
+
+scenarios("m03-leaderboard.feature")
+
+@given("the scoring task for the current day has completed")
+def scoring_completed():
+    raise NotImplementedError  # TODO: implement
+
+@when("the system triggers leaderboard calculation")
+def trigger_calculation():
+    raise NotImplementedError  # TODO: implement
+
+@then("the leaderboard is computed based on the completed scoring results")
+def assert_leaderboard_computed():
+    raise NotImplementedError  # TODO: implement
+```
+
+The stubs fail until implemented, so "spec done" and "tests defined" become the
+same milestone. Emit one `.steps.<ext>` per `.feature`; pick the ecosystem's BDD
+runner (pytest-bdd, Cucumber, behave, godog, etc.).

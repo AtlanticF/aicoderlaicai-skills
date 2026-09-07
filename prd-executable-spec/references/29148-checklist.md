@@ -27,3 +27,9 @@ Use this checklist in Phase 1 to scan the PRD for missing dimensions.
 ```
 
 > **Key additions over IEEE 830**: Stakeholder Requirements (align on who needs what before building), Operational Requirements (timezone, scheduled trigger rules, runtime behavior), Verification Requirements (how each requirement is validated), and traceability.
+
+> **Make NFRs verifiable, not prose**: Any item under Performance, Security,
+> Operational, or Quality Characteristics that is flagged ❌ or is stated only in
+> prose must be translated into a measurable NFR (metric + target + condition +
+> verification method) via `references/nfr-verification.md`. A performance/quality
+> requirement without a number is a `needs_clarification` issue, not a spec.
