@@ -37,6 +37,20 @@ It also targets real engineering pains beyond single-requirement precision:
 
 Path: `prd-executable-spec/`
 
+### `3d-character-generation`
+
+Produces a Pixar/"Up"-style Q-version 3D animated character as a **transparent-background (alpha channel) video** ready to drop into an app, website, or product UI. Runs the full pipeline:
+
+- pick a character concept (example: an orange);
+- generate a Pixar/Up-style, Q-style image on a white background (1:1, 1K);
+- animate it into a short idle "looking around + gentle hand swing" clip;
+- key out the white background and export an alpha-channel video (ProRes 4444 / WebM VP9 alpha / PNG sequence);
+- compress the transparent video with `ffmpeg` while preserving alpha.
+
+Includes prompt templates and a tested transparency + compression reference (correct VP9-alpha command and how to actually verify alpha survived).
+
+Path: `3d-character-generation/`
+
 ## Repository Structure
 
 ```text
