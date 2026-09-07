@@ -1,0 +1,98 @@
+{
+  "spec_version": "1.2.0",
+  "source_document": "Distributor Commission PRD v3",
+  "source_hash": "sha256:6b1f...c92a",
+  "generated_at": "2026-09-07T00:00:00Z",
+  "glossary": [
+    {
+      "term": "agent",
+      "definition": "A user who earns commission by referring trading users.",
+      "canonical_name": "agent",
+      "aliases": ["distributor", "referrer"]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "M03-F01-R01",
+      "module": "Settlement",
+      "feature": "Leaderboard Calculation",
+      "requirement": "Compute the daily leaderboard once per day after the scoring task completes.",
+      "original_text": "Calculate the leaderboard once per day.",
+      "intent": "Drive daily engagement by publishing a fresh ranking every morning.",
+      "29148_category": "functional",
+      "complexity": "M",
+      "risk": "medium",
+      "acceptance_owner": "Growth PM",
+      "gherkin": "Feature: M03-F01 Leaderboard Calculation\n  Scenario: Daily leaderboard — triggered after scoring task\n    Given the scoring task for the current day has completed\n    And the current time in the user's local timezone is before 02:00\n    When the system triggers leaderboard calculation\n    Then the leaderboard is computed based on the completed scoring results",
+      "logic": {
+        "pseudocode": "IF scoring_done AND local_time < 02:00 THEN compute_leaderboard()",
+        "formula": null,
+        "state_machine": null,
+        "conditions": ["scoring_done == true", "local_time < 02:00"]
+      },
+      "data_schema": null,
+      "entity_impact": {
+        "new_entities": ["LeaderboardSnapshot"],
+        "modified_entities": ["ScoringResult"],
+        "migration_notes": "Add index on ScoringResult(completed_at) to support the trigger query."
+      },
+      "api_spec": null,
+      "error_contract": {
+        "errors": [
+          { "code": "SCORING_NOT_READY", "http_status": 409, "when": "Triggered before scoring completes", "retriable": true }
+        ],
+        "idempotent": true,
+        "idempotency_key": "date+timezone",
+        "retry_policy": "Retry every 10m until 02:00 local, then alert."
+      },
+      "observability": {
+        "logs": ["leaderboard.trigger.received", "leaderboard.compute.completed"],
+        "metrics": ["leaderboard_compute_duration_ms", "leaderboard_compute_failures_total"],
+        "alerts": ["scoring not complete by 02:00 local time"]
+      },
+      "nfr": [
+        {
+          "category": "performance",
+          "metric": "compute_duration",
+          "target": "p99 < 60s",
+          "condition": "up to 1,000,000 ranked users",
+          "verification_method": "load_test"
+        }
+      ],
+      "dependencies": [],
+      "issues": [
+        {
+          "type": "ambiguity",
+          "severity": "minor",
+          "location": "gherkin",
+          "original_text": "Calculate the leaderboard once per day.",
+          "description": "Tie-breaking rule between equal scores is unspecified.",
+          "proposed_fix": "Break ties by earliest completion timestamp.",
+          "question": "How should ties be broken?"
+        }
+      ],
+      "spec_status": "confirmed"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-M03-01",
+      "requirement_id": "M03-F01-R01",
+      "statement": "Leaderboard ties are broken by earliest completion timestamp.",
+      "default_choice": "earliest_timestamp_wins",
+      "alternatives": ["highest_user_id_wins", "random"],
+      "rationale": "Deterministic and auditable; most common convention.",
+      "needs_veto_by": "Growth PM",
+      "status": "assumed"
+    }
+  ],
+  "change_log": [
+    {
+      "requirement_id": "M03-F01-R01",
+      "change_type": "modified",
+      "summary": "Trigger deadline tightened from 03:00 to 02:00 local time.",
+      "stale_artifacts": ["m03-leaderboard.feature", "m03-leaderboard-trigger.dmn"],
+      "impacted_downstream": ["M04-F01-R02 (consumes LeaderboardSnapshot)"]
+    }
+  ]
+}

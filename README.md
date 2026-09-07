@@ -23,6 +23,17 @@ Transforms PRDs into engineering-grade executable specifications. It is designed
 - DMN decision tables
 - pseudocode and formula-level logic
 - JSON Schema / OpenAPI data definitions
+- verifiable NFRs (measurable target + verification method)
+
+It also targets real engineering pains beyond single-requirement precision:
+
+- **Severity-tiered gate + partial handoff** — only `blocker`/`major` issues block a module; clean modules ship without waiting for the whole PRD.
+- **Assumption register (default-and-proceed)** — `minor` ambiguities get a recorded default instead of stalling the loop; silence = acceptance, product can veto later.
+- **Delta mode** — re-analyze a changed PRD, diff it, and flag stale downstream artifacts along the dependency graph.
+- **Engineering contracts** — per-point `error_contract` (codes/idempotency/retries), `observability` (logs/metrics/alerts), and `entity_impact` (new vs. modified entities + migration).
+- **Prioritization signal** — `complexity`, `risk`, and `intent` on every point.
+- **Machine-checkable** — `prd_spec.json` validates against `prd-executable-spec/schemas/prd_spec.schema.json`; a cross-artifact linter catches field/enum/DMN/glossary drift.
+- **Runnable output** — optional failing test-step stubs generated from each `.feature`.
 
 Path: `prd-executable-spec/`
 
@@ -34,7 +45,8 @@ Path: `prd-executable-spec/`
 ├── CLAUDE.md
 └── <skill-name>/
     ├── SKILL.md
-    └── references/
+    ├── references/
+    └── schemas/        # optional: machine-validatable schemas + example fixtures
 ```
 
 ## Skill Authoring Conventions

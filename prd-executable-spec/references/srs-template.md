@@ -30,6 +30,9 @@ Use this structure when generating `prd_spec_report.md` in Phase 4.
 
 **Requirement M01-F01-R01: [Name]**
 
+**Intent**: [the business goal / metric this requirement moves]
+**Complexity**: S/M/L/XL   **Risk**: low/medium/high   **Acceptance owner**: [name]
+
 **Behavior Spec (BDD)**:
 ​```gherkin
 Feature: ...
@@ -57,25 +60,49 @@ formula = ...
   get: ...
 ​```
 
+**Entity Impact**:
+- New: [entities] | Modified: [entities] | Migration: [notes]
+
+**Error / Idempotency / Observability Contract**:
+- Errors: [code → when → retriable] | Idempotent: yes/no (key: ...) | Retry: ...
+- Logs / Metrics / Alerts: ...
+
+**Verifiable NFRs** (if applicable):
+| Metric | Target | Condition | Verification |
+|--------|--------|-----------|--------------|
+
 **Open Items** (if any):
-- [ ] Issue description — suggested confirmation: ...
+- [ ] [severity] Issue description — suggested confirmation: ...
 
 [Repeat above structure for all requirement points]
 
-## 4. Non-Functional Requirements
-### 4.1 Performance
-### 4.2 Security
-### 4.3 Availability
+## 4. Non-Functional Requirements (verifiable)
+Every entry is measurable: metric + target + condition + verification method.
+See `references/nfr-verification.md`.
+| Category | Metric | Target | Condition | Verification |
+|----------|--------|--------|-----------|--------------|
 
 ## 5. Cross-Module Constraints
 [Data consistency, ordering constraints, and shared invariants across modules]
 
-## 6. Issue Tracker
-| ID | Module | Type | Description | Status |
-|----|--------|------|-------------|--------|
+## 6. Assumption Register
+Default decisions taken for `minor` issues. Silence = acceptance; product may veto.
+| ID | Requirement | Assumption | Default | Needs veto by | Status |
+|----|-------------|-----------|---------|---------------|--------|
+
+## 7. Issue Tracker
+| ID | Module | Type | Severity | Description | Status |
+|----|--------|------|----------|-------------|--------|
+
+## 8. Change Log (Delta mode)
+Populated when re-analyzing a changed PRD. Lists what changed and which
+downstream artifacts went stale.
+| Requirement | Change | Summary | Stale artifacts | Impacted downstream |
+|-------------|--------|---------|-----------------|---------------------|
 
 ## Appendix
 ### A. Full JSON Schema
 ### B. Full OpenAPI Spec
 ### C. State Machine Summary
+### D. Glossary (canonical terms + aliases)
 ```
