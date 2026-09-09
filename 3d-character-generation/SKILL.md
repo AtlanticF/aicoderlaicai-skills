@@ -99,11 +99,17 @@ Key points (full walkthrough in `references/transparency-and-compression.md`):
 - Apply a **luma/chroma key** (or "3D Keyer" in DaVinci) to knock out the white.
 - Refine the matte (clip black/white, slight edge shrink/blur) to remove white fringing.
 - Export a format **with an alpha channel**, e.g.:
-  - DaVinci: QuickTime **ProRes 4444** (`.mov`) — alpha, high quality, large.
+  - DaVinci: QuickTime **ProRes 4444** (`.mov`) — alpha, high quality, large. **Preferred
+    master** because ffmpeg can read its alpha for later compression.
   - Web/app: **WebM VP9 with alpha** (`.webm`).
-  - Fallback: **PNG image sequence** (always preserves alpha).
+  - Fallback: **PNG image sequence** (always preserves alpha, universally readable).
 - Do **not** export H.264 `.mp4` for this step — standard MP4/H.264 has no alpha and
   will bake the background back in.
+- ⚠️ Note on **HEVC-with-alpha** `.mov` (a common macOS "transparent" export): it is real
+  alpha and plays in Safari/QuickTime/After Effects, but **ffmpeg cannot decode its alpha
+  layer** (it renders transparency as black), so it is a poor master for Step 5
+  compression on non-Apple machines. If you plan to compress with ffmpeg, export ProRes
+  4444 or a PNG sequence instead. See `references/transparency-and-compression.md`.
 - Save as `{{character}}-role-asset.mov` (ProRes 4444) as the master.
 
 > Alpha reality check (ProRes/PNG master): play it over a colored background, or run

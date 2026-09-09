@@ -17,6 +17,21 @@ The one rule that governs everything: **only alpha-capable formats keep transpar
 > (1-bit "transparency" only). Never route the transparent asset through H.264 MP4 —
 > it bakes the background back in.
 
+> ⚠️ **HEVC-with-alpha is Apple-playback-friendly but hard to transcode.** A "transparent"
+> `.mov` exported on macOS is often HEVC (`hvc1`) with the alpha stored in an auxiliary
+> layer (`nuh_layer_id 1`) + alpha-channel-info SEI (`payloadType 165`). Safari/QuickTime/
+> After Effects read it, but **`ffmpeg` decodes only the base layer and renders the
+> transparent area as solid black** — so you cannot reliably compress it to WebM with
+> ffmpeg on a non-Apple box, and you must not "key out" the black (it destroys any dark
+> parts of the character). For a portable compression pipeline, prefer a **ProRes 4444**
+> `.mov` or a **PNG sequence** as your master; convert HEVC-alpha only on macOS.
+>
+> Detect HEVC alpha without mediainfo:
+> ```bash
+> ffmpeg -i in.mov -c:v copy -bsf:v hevc_mp4toannexb out.hevc   # then inspect NAL layers
+> ```
+> If the stream contains `nuh_layer_id 1` and SEI payloadType 165, it has HEVC alpha.
+
 ## Step 4 — Key out the white background
 
 ### DaVinci Resolve (recommended for true alpha)
