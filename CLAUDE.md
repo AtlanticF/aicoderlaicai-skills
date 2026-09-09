@@ -41,6 +41,14 @@ The `description` field is critical — it determines when Claude auto-triggers 
 - `prd-executable-spec/schemas/prd_spec.schema.json` — Machine-validatable JSON Schema for `prd_spec.json` (CI gate enforcement)
 - `prd-executable-spec/schemas/examples/prd_spec.example.json` — Valid example instance / fixture
 
+- **3d-character-generation** — Produces a Pixar/"Up"-style Q-version 3D animated character as a transparent-background (alpha channel) video asset. Five-step pipeline: choose concept → generate a 1:1 1K white-background image → animate to a short idle clip → key out the white background and export an alpha video → compress with `ffmpeg` preserving alpha. Emphasizes that only alpha-capable formats (ProRes 4444, WebM VP9 alpha, HEVC alpha, PNG sequence) keep transparency, and documents the tested VP9-alpha command plus the correct way to verify alpha survived (WebM: `alpha_mode=1` tag + browser preview, not `pix_fmt`).
+
+### 3d-character-generation key files
+- `3d-character-generation/SKILL.md` — Full 5-step pipeline, prompts, and key principles
+- `3d-character-generation/references/prompts.md` — Image + image-to-video prompt templates
+- `3d-character-generation/references/transparency-and-compression.md` — Keying (DaVinci/CapCut), alpha export formats, `ffmpeg` compression commands, and format-specific alpha verification
+- `3d-character-generation/examples/README.md` — Orange mascot example run + how to add the binary asset (Git LFS)
+
 ## Adding a New Skill
 
 1. Create a new directory named after the skill (use kebab-case).
